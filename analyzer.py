@@ -8,12 +8,14 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
+
 def calculate_match(job_skills: list, user_skills: list) -> int:
     if not job_skills:
         return 0
     matching = [skill for skill in user_skills if skill in job_skills]
     score = len(matching) / len(job_skills) * 100
     return int(score)
+
 
 async def analyze_job(description: str, user_skills: list) -> dict:
     prompt = f"""
@@ -30,8 +32,4 @@ async def analyze_job(description: str, user_skills: list) -> dict:
         result = json.loads(response.text)
         return result
     except Exception as error:
-        return {
-            "match_score": 0,
-            "missing_skills": [],
-            "time_to_learn": {}
-        }
+        return {"match_score": 0, "missing_skills": [], "time_to_learn": {}}

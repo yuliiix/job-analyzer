@@ -5,19 +5,22 @@ from models import Application
 
 load_dotenv()
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_KEY")
-)
+supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+
 
 def save_application(application: Application):
-    result = supabase.table("applications").insert({
-        "company": application.company,
-        "status": application.status,
-        "match_score": application.match_score
-    }).execute()
+    result = (
+        supabase.table("applications")
+        .insert(
+            {
+                "company": application.company,
+                "status": application.status,
+                "match_score": application.match_score,
+            }
+        )
+        .execute()
+    )
     return result.data
-
 
 
 def get_applications():
@@ -26,9 +29,9 @@ def get_applications():
 
 
 def update_status(id: int, status: str):
-    result = supabase.table("applications").update({
-        "status": status
-    }).eq("id", id).execute()
+    result = (
+        supabase.table("applications").update({"status": status}).eq("id", id).execute()
+    )
     return result.data
 
 
