@@ -46,6 +46,7 @@ def create_application(application: Application):
     result = save_application(application)
     return result
 
+
 @app.post("/extract-skills")
 async def extract_skills_from_upload(file: UploadFile = File(...)):
     contents = await file.read()

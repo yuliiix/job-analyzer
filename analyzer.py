@@ -43,6 +43,7 @@ def extract_text_from_pdf(pdf_file) -> str:
             text += page.extract_text() or ""
         return text
 
+
 async def extract_skills_from_cv(cv_text: str) -> list[str]:
     prompt = f"""
     זהו טקסט של קורות חיים:

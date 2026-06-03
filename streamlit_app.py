@@ -178,9 +178,14 @@ with tab1:
     col_left, col_right = st.columns([1, 1], gap="large")
 
     with col_left:
-        st.markdown('<div class="card"><p class="card-title">📄 פרטי המשרה</p>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="card"><p class="card-title">📄 פרטי המשרה</p>',
+            unsafe_allow_html=True,
+        )
 
-        description = st.text_area("תיאור המשרה", height=140, placeholder="הדבק כאן את תיאור המשרה...")
+        description = st.text_area(
+            "תיאור המשרה", height=140, placeholder="הדבק כאן את תיאור המשרה..."
+        )
         company_name = st.text_input("שם החברה", placeholder="Google")
 
         cv_file = st.file_uploader("קורות חיים (PDF)", type=["pdf"])
@@ -190,7 +195,13 @@ with tab1:
                 try:
                     res = requests.post(
                         f"{API_URL}/extract-skills",
-                        files={"file": (cv_file.name, cv_file.getvalue(), "application/pdf")},
+                        files={
+                            "file": (
+                                cv_file.name,
+                                cv_file.getvalue(),
+                                "application/pdf",
+                            )
+                        },
                         timeout=30,
                     )
                     extracted = res.json().get("skills", [])
@@ -223,7 +234,10 @@ with tab1:
                     try:
                         res = requests.post(
                             f"{API_URL}/analyze",
-                            json={"description": description, "user_skills": user_skills},
+                            json={
+                                "description": description,
+                                "user_skills": user_skills,
+                            },
                             timeout=30,
                         )
                         r = res.json()
@@ -243,8 +257,13 @@ with tab1:
                         )
 
                         have = [s for s in user_skills if s not in missing]
-                        have_html = "".join(f'<span class="tag tag-have">✓ {s}</span>' for s in have)
-                        miss_html = "".join(f'<span class="tag tag-missing">✗ {s}</span>' for s in missing)
+                        have_html = "".join(
+                            f'<span class="tag tag-have">✓ {s}</span>' for s in have
+                        )
+                        miss_html = "".join(
+                            f'<span class="tag tag-missing">✗ {s}</span>'
+                            for s in missing
+                        )
                         st.markdown(
                             f"""<div class="card">
                             <p class="card-title">⚡ כישורים</p>
@@ -295,7 +314,10 @@ with tab1:
 # TAB 2
 # ================================================
 with tab2:
-    st.markdown('<div class="card"><p class="card-title">📋 רשימת המשרות שלי</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="card"><p class="card-title">📋 רשימת המשרות שלי</p>',
+        unsafe_allow_html=True,
+    )
     try:
         apps = requests.get(f"{API_URL}/applications", timeout=10).json()
         if apps:
@@ -306,11 +328,20 @@ with tab2:
                 app_id = app.get("id")
                 col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
                 with col1:
-                    st.markdown(f"<span class='app-company'>{company}</span>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<span class='app-company'>{company}</span>",
+                        unsafe_allow_html=True,
+                    )
                 with col2:
-                    st.markdown(f'<span class="status-badge s-{status}">{status}</span>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<span class="status-badge s-{status}">{status}</span>',
+                        unsafe_allow_html=True,
+                    )
                 with col3:
-                    st.markdown(f"<span class='app-score'>{score}%</span>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<span class='app-score'>{score}%</span>",
+                        unsafe_allow_html=True,
+                    )
                 with col4:
                     if st.button("🗑", key=f"del_{app_id}"):
                         requests.delete(f"{API_URL}/applications/{app_id}")
