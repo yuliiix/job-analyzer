@@ -206,7 +206,7 @@ components.html(
     height=0,
 )
 
-API_URL = "http://localhost:8000"
+API_URL = "https://job-analyzer-oi1o.onrender.com"
 TIMEOUT_SECONDS = 30 * 60
 cookie_manager = stx.CookieManager()
 
