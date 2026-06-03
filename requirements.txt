@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+supabase
+python-dotenv
+pytest
+httpx
+streamlit
+google-generativeai
+black
