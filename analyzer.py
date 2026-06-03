@@ -1,13 +1,13 @@
-import google.generativeai as genai
 import os
 import json
 import pdfplumber
 from dotenv import load_dotenv
+from groq import Groq
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-pro")
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+MODEL = "llama-3.3-70b-versatile"
 
 
 def calculate_match(job_skills: list, user_skills: list) -> int:
@@ -21,7 +21,7 @@ def calculate_match(job_skills: list, user_skills: list) -> int:
 async def analyze_job(description: str, user_skills: list) -> dict:
     prompt = f"""
     תיאור משרה: {description}
-    כישורי המועמדת: {user_skills}
+    כישורי המועמד: {user_skills}
     
     נתח את ההתאמה והחזר JSON בלבד עם השדות:
     - match_score: מספר בין 0-100
@@ -29,10 +29,15 @@ async def analyze_job(description: str, user_skills: list) -> dict:
     - time_to_learn: מילון עם זמן לימוד לכל כישור חסר
     """
     try:
-        response = model.generate_content(prompt)
-        result = json.loads(response.text)
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+        )
+        result = json.loads(response.choices[0].message.content)
         return result
     except Exception as error:
+        print("ERROR:", error)
         return {"match_score": 0, "missing_skills": [], "time_to_learn": {}}
 
 
@@ -53,27 +58,13 @@ async def extract_skills_from_cv(cv_text: str) -> list[str]:
     {{"skills": ["Python", "FastAPI", ...]}}
     """
     try:
-        response = model.generate_content(prompt)
-        result = json.loads(response.text)
-        return result.get("skills", [])
-    except Exception:
-        return []
-
-
-async def extract_skills_from_cv(cv_text: str) -> list[str]:
-    print("CV TEXT:", cv_text[:200])  # ← הוסיפי
-    prompt = f"""
-    זהו טקסט של קורות חיים:
-    {cv_text}
-    
-    החזר JSON בלבד — רשימת כישורים טכניים:
-    {{"skills": ["Python", "FastAPI", ...]}}
-    """
-    try:
-        response = model.generate_content(prompt)
-        print("GEMINI RESPONSE:", response.text)  # ← הוסיפי
-        result = json.loads(response.text)
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+        )
+        result = json.loads(response.choices[0].message.content)
         return result.get("skills", [])
     except Exception as e:
-        print("ERROR:", e)  # ← הוסיפי
+        print("ERROR:", e)
         return []

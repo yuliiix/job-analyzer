@@ -6,7 +6,7 @@ python-dotenv
 pytest
 httpx
 streamlit
-google-generativeai
+google-genai
 black
 fastapi
 uvicorn
@@ -21,3 +21,4 @@ google-generativeai
 black
 pdfplumber
 python-multipart
+groq
