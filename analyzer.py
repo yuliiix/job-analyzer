@@ -58,3 +58,22 @@ async def extract_skills_from_cv(cv_text: str) -> list[str]:
         return result.get("skills", [])
     except Exception:
         return []
+
+
+async def extract_skills_from_cv(cv_text: str) -> list[str]:
+    print("CV TEXT:", cv_text[:200])  # ← הוסיפי
+    prompt = f"""
+    זהו טקסט של קורות חיים:
+    {cv_text}
+    
+    החזר JSON בלבד — רשימת כישורים טכניים:
+    {{"skills": ["Python", "FastAPI", ...]}}
+    """
+    try:
+        response = model.generate_content(prompt)
+        print("GEMINI RESPONSE:", response.text)  # ← הוסיפי
+        result = json.loads(response.text)
+        return result.get("skills", [])
+    except Exception as e:
+        print("ERROR:", e)  # ← הוסיפי
+        return []
