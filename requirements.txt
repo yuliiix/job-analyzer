@@ -8,3 +8,14 @@ httpx
 streamlit
 google-generativeai
 black
+fastapi
+uvicorn
+pydantic
+supabase
+python-dotenv
+pytest
+pytest-asyncio
+httpx
+streamlit
+google-generativeai
+black
