@@ -29,3 +29,8 @@ def update_application_status(id: int, status: str):
 def delete_app(id: int):
     result = delete_application(id)
     return result
+
+@app.post("/applications")
+def create_application(application: Application):
+    result = save_application(application)
+    return result
