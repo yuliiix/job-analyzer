@@ -1,6 +1,8 @@
-from fastapi import FastAPI
 from models import JobRequest, AnalysisResponse, Application
-from analyzer import analyze_job
+from analyzer import analyze_job, extract_text_from_pdf, extract_skills_from_cv
+from fastapi import FastAPI, UploadFile, File
+import io
+
 from database import (
     save_application,
     get_applications,
@@ -43,3 +45,11 @@ def delete_app(id: int):
 def create_application(application: Application):
     result = save_application(application)
     return result
+
+@app.post("/extract-skills")
+async def extract_skills_from_upload(file: UploadFile = File(...)):
+    contents = await file.read()
+    pdf_file = io.BytesIO(contents)
+    cv_text = extract_text_from_pdf(pdf_file)
+    skills = await extract_skills_from_cv(cv_text)
+    return {"skills": skills}

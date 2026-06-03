@@ -19,3 +19,5 @@ httpx
 streamlit
 google-generativeai
 black
+pdfplumber
+python-multipart
