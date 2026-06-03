@@ -8,7 +8,7 @@ load_dotenv()
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 
-def save_application(application: Application):
+def save_application(application: Application, user_id: str):
     result = (
         supabase.table("applications")
         .insert(
@@ -16,6 +16,7 @@ def save_application(application: Application):
                 "company": application.company,
                 "status": application.status,
                 "match_score": application.match_score,
+                "user_id": user_id,
             }
         )
         .execute()
@@ -23,8 +24,8 @@ def save_application(application: Application):
     return result.data
 
 
-def get_applications():
-    result = supabase.table("applications").select("*").execute()
+def get_applications(user_id: str):  # ← חדש!
+    result = supabase.table("applications").select("*").eq("user_id", user_id).execute()
     return result.data
 
 

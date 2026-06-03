@@ -13,21 +13,38 @@ MODEL = "llama-3.3-70b-versatile"
 def calculate_match(job_skills: list, user_skills: list) -> int:
     if not job_skills:
         return 0
-    matching = [skill for skill in user_skills if skill in job_skills]
-    score = len(matching) / len(job_skills) * 100
+    job_lower = [s.lower().strip() for s in job_skills]
+    user_lower = [s.lower().strip() for s in user_skills]
+    matching = [s for s in user_lower if s in job_lower]
+    score = len(matching) / len(job_lower) * 100
     return int(score)
 
 
 async def analyze_job(description: str, user_skills: list) -> dict:
     prompt = f"""
-    תיאור משרה: {description}
-    כישורי המועמד: {user_skills}
-    
-    נתח את ההתאמה והחזר JSON בלבד עם השדות:
-    - match_score: מספר בין 0-100
-    - missing_skills: רשימת כישורים חסרים
-    - time_to_learn: מילון עם זמן לימוד לכל כישור חסר
-    """
+You are an expert job matching analyst.
+
+Job description:
+{description}
+
+Candidate skills:
+{user_skills}
+
+Instructions:
+- Compare skills case-insensitively (e.g. "Python" == "python")
+- Consider partial matches and related skills (e.g. "VMware vSphere" counts if candidate has "VMware")
+- Consider experience-based skills (e.g. system administration experience covers basic IT tasks)
+- Be generous but accurate — if the candidate clearly has the skill in a different form, count it as a match
+- missing_skills should only include skills the candidate genuinely lacks
+- time_to_learn should consider the candidate's existing background
+
+Return ONLY a JSON object with these exact fields:
+{{
+  "match_score": <number 0-100>,
+  "missing_skills": [<list of skills the candidate truly lacks>],
+  "time_to_learn": {{<skill>: <estimated time considering candidate background>}}
+}}
+"""
     try:
         response = client.chat.completions.create(
             model=MODEL,
@@ -51,12 +68,20 @@ def extract_text_from_pdf(pdf_file) -> str:
 
 async def extract_skills_from_cv(cv_text: str) -> list[str]:
     prompt = f"""
-    זהו טקסט של קורות חיים:
-    {cv_text}
-    
-    החזר JSON בלבד — רשימת כישורים טכניים:
-    {{"skills": ["Python", "FastAPI", ...]}}
-    """
+You are an expert CV analyst.
+
+CV text:
+{cv_text}
+
+Extract ALL technical and professional skills from this CV.
+Include: programming languages, frameworks, tools, platforms, methodologies, certifications, soft skills relevant to tech roles.
+Be thorough — extract skills even if mentioned in experience descriptions, not just in a skills section.
+
+Return ONLY a JSON object:
+{{
+  "skills": [<list of skills as strings>]
+}}
+"""
     try:
         response = client.chat.completions.create(
             model=MODEL,
