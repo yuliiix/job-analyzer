@@ -62,3 +62,7 @@ async def extract_skills_from_upload(file: UploadFile = File(...)):
     cv_text = extract_text_from_pdf(pdf_file)
     skills = await extract_skills_from_cv(cv_text)
     return {"skills": skills}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
